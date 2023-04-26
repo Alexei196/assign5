@@ -1,11 +1,13 @@
 #include<stdio.h>
 #include<stdlib.h>
+#include<upcxx/upcxx.hpp>
 
 #define RAND_D ( -1.0 + ( (double)rand() / (RAND_MAX / 2.0)))
 
 long long int makeTosses(long long int);
 
 int main(int argc, char** argv) {
+    srand(time(null));
     if(argc < 2) {
         fprintf(stderr, "ERROR: Not enough arguments\n");
         //TODO abort upcxx
@@ -17,8 +19,8 @@ int main(int argc, char** argv) {
         //TODO abort upcxx
         return 1;
     }
-    //TODO use upcxx to assign threadCount and rank
-    int threadCount, my_rank;
+    upcxx::init();
+    int threadCount = upcxx::rank_n(), my_rank = upcxx::rank_me();
     double wTime = 0;
 
     //TODO access need to broadcast elements per thread
@@ -51,5 +53,6 @@ long long int makeTosses(long long int assignedTosses) {
         }
     }
     //TODO confirm reduction of sums
+    upcxx::finalize();
     return landedSum;
 }
