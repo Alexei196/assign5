@@ -29,6 +29,7 @@ int main(int argc, char** argv) {
         if(totalTosses < 31) {
             totalTosses = pow(2, totalTosses);
         }
+        
     }
     gettimeofday(&startTime, NULL);
     //broadcast total amount of tosses to all processes

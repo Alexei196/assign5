@@ -17,6 +17,7 @@ int main(int argc, char** argv) {
     upcxx::init();
     int my_rank = (int) upcxx::rank_me();
     int arrayTotalSize;
+    bool printArrays = false;
     //Init checking by the root process
     if(upcxx::rank_me() == 0) {
         if(argc < 2) {
@@ -53,11 +54,13 @@ int main(int argc, char** argv) {
         myVector.emplace_back(rand() % MAX_RAND_INT);
     }
     //print init vector
-    printf("Rank %d: [", upcxx::rank_me());
-    for(int i = 0; i < myVector.size(); ++i) {
-        printf("%d, ", myVector[i]);
+    if(printArrays) {
+        printf("Rank %d: [", upcxx::rank_me());
+        for(int i = 0; i < myVector.size(); ++i) {
+            printf("%d, ", myVector[i]);
+        }
+        printf("] with size %ld\n", myVector.size());
     }
-    printf("] with size %ld\n", myVector.size());
     gettimeofday(&startTime, NULL);
     upcxx::barrier();
     //bubble sort init arrays under the watch of the timer
@@ -78,11 +81,15 @@ int main(int argc, char** argv) {
     double totalTime = TIME(endTime) - TIME(startTime);
     totalTime = upcxx::reduce_one(totalTime, upcxx::op_fast_max, 0).wait();
     if(upcxx::rank_me() == 0) {
-        printf("End Array : ");
-        for(int i =0; i < myVector.size(); ++i) {
-            printf("%d, ", myVector[i]);
+        if(printArrays) {
+            printf("End Array : ");
+            for(int i =0; i < myVector.size(); ++i) {
+                printf("%d, ", myVector[i]);
+            }
+            printf("\nVector size %ld\n", myVector.size());
+        } else {
+            printf("Process complete, ");
         }
-        printf("\nVector size %ld\n", myVector.size());
         printf("My time is %f\n", totalTime);
     }
     //finish
